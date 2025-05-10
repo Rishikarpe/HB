@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Pages with Background Video</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .video-background video {
+            position: absolute;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+        .book {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            text-align: center;
+        }
+        .dimensions-box {
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+        .box-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            transform-origin: left center;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+            backface-visibility: hidden;
+            background-color: white;
+            border: 2px solid #333;
+        }
+        .box-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotateY(180deg);
+            backface-visibility: hidden;
+            background-color: #f8f8f8;
+            border: 2px solid #333;
+        }
+        #box1 {
+            width: 464px;
+            height: 600px;
+        }
+        #box2 {
+            width: 928px;
+            height: 600px;
+        }
+        #box3 {
+            width: 464px;
+            height: 600px;
+        }
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        .left {
+            left: 20px;
+        }
+        .right {
+            right: 20px;
+        }
+        .page-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            z-index: 100;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            margin-top: 20px;
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        .box-shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 30%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .turning .box-shadow {
+            opacity: 1;
+        }
+        .flipped .box-content {
+            transform: rotateY(-180deg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="\bg\2.mp4" type="video/mp4">
+            <!-- Since we can't use real videos in this playground, we're using a placeholder. 
+                 In a real implementation, you would replace with an actual video URL -->
+        </video>
+    </div>
+    <div class="overlay"></div>
+    
+    <div class="book" id="book">
+        <div class="page active" id="page1">
+            <div class="content">
+                <div class="dimensions-box" id="box1">
+                    <div class="box-content">
+                        <span>464 × 600</span>
+                        <div class="box-shadow"></div>
+                    </div>
+                    <div class="box-back">
+                        <span>Back of Page 1</span>
+                    </div>
+                </div>
+                <h1>Page 1</h1>
+            </div>
+        </div>
+        
+        <div class="page" id="page2">
+            <div class="content">
+                <div class="dimensions-box" id="box2">
+                    <div class="box-content">
+                        <span>928 × 600</span>
+                        <div class="box-shadow"></div>
+                    </div>
+                    <div class="box-back">
+                        <span>Back of Page 2</span>
+                    </div>
+                </div>
+                <h1>Page 2</h1>
+            </div>
+        </div>
+        
+        <div class="page" id="page3">
+            <div class="content">
+                <div class="dimensions-box" id="box3">
+                    <div class="box-content">
+                        <span>464 × 600</span>
+                        <div class="box-shadow"></div>
+                    </div>
+                    <div class="box-back">
+                        <span>Back of Page 3</span>
+                    </div>
+                </div>
+                <h1>Page 3</h1>
+            </div>
+        </div>
+
+        <button class="nav-button left" id="prevBtn" onclick="previousPage()">←</button>
+        <button class="nav-button right" id="nextBtn" onclick="nextPage()">→</button>
+        <div class="page-indicator" id="pageIndicator">1 / 3</div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 3;
+        let isAnimating = false;
+        
+        // Initialize pages
+        function initPages() {
+            // Hide previous button initially
+            document.getElementById('prevBtn').style.display = 'none';
+            updatePageIndicator();
+            
+            // Try to play the video automatically (might be restricted by browsers)
+            const video = document.querySelector('video');
+            video.play().catch(error => {
+                console.log("Auto-play prevented:", error);
+                // Add a play button if autoplay fails
+                if (error.name === "NotAllowedError") {
+                    const playButton = document.createElement('button');
+                    playButton.innerText = "Play Background";
+                    playButton.style.position = "fixed";
+                    playButton.style.bottom = "20px";
+                    playButton.style.left = "20px";
+                    playButton.style.zIndex = "100";
+                    playButton.style.padding = "10px";
+                    playButton.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+                    playButton.style.backdropFilter = "blur(5px)";
+                    playButton.style.border = "none";
+                    playButton.style.borderRadius = "5px";
+                    playButton.style.color = "white";
+                    playButton.style.cursor = "pointer";
+                    playButton.onclick = () => {
+                        video.play();
+                        playButton.style.display = "none";
+                    };
+                    document.body.appendChild(playButton);
+                }
+            });
+        }
+        
+        function nextPage() {
+            if (currentPage < totalPages && !isAnimating) {
+                isAnimating = true;
+                
+                // Get current box and add turning effect
+                const currentBox = document.querySelector(`#page${currentPage} .dimensions-box`);
+                currentBox.classList.add('turning');
+                
+                // Flip the box content
+                setTimeout(() => {
+                    currentBox.classList.add('flipped');
+                }, 50);
+                
+                // After animation completes
+                setTimeout(() => {
+                    // Hide current page, show next page
+                    document.getElementById(`page${currentPage}`).classList.remove('active');
+                    currentPage++;
+                    document.getElementById(`page${currentPage}`).classList.add('active');
+                    
+                    // Reset the previous box
+                    currentBox.classList.remove('turning');
+                    
+                    updateNavButtons();
+                    updatePageIndicator();
+                    isAnimating = false;
+                }, 1000);
+            }
+        }
+        
+        function previousPage() {
+            if (currentPage > 1 && !isAnimating) {
+                isAnimating = true;
+                
+                // Get previous box and prepare for animation
+                const previousBox = document.querySelector(`#page${currentPage-1} .dimensions-box`);
+                previousBox.classList.add('turning');
+                
+                // Show previous page
+                document.getElementById(`page${currentPage}`).classList.remove('active');
+                currentPage--;
+                document.getElementById(`page${currentPage}`).classList.add('active');
+                
+                // Unflip the box content
+                setTimeout(() => {
+                    previousBox.classList.remove('flipped');
+                }, 50);
+                
+                // After animation completes
+                setTimeout(() => {
+                    previousBox.classList.remove('turning');
+                    updateNavButtons();
+                    updatePageIndicator();
+                    isAnimating = false;
+                }, 1000);
+            }
+        }
+        
+        function updateNavButtons() {
+            document.getElementById('prevBtn').style.display = currentPage > 1 ? 'flex' : 'none';
+            document.getElementById('nextBtn').style.display = currentPage < totalPages ? 'flex' : 'none';
+        }
+        
+        function updatePageIndicator() {
+            document.getElementById('pageIndicator').textContent = `${currentPage} / ${totalPages}`;
+        }
+        
+        // Add swipe functionality for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+        
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            if (touchEndX < touchStartX - swipeThreshold) {
+                nextPage(); // Swipe left
+            }
+            if (touchEndX > touchStartX + swipeThreshold) {
+                previousPage(); // Swipe right
+            }
+        }
+        
+        // Initialize on page load
+        window.onload = initPages;
+    </script>
+</body>
+</html>
