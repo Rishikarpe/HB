@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Pages with Background Video</title>
+    <title>Happy Birthday Bournvita!!!!</title>
     <style>
         body {
             margin: 0;
@@ -96,6 +96,12 @@
             backface-visibility: hidden;
             background-color: white;
             border: 2px solid #333;
+            overflow: hidden;
+        }
+        .box-content img {
+            width: 100%; /* Ensure the image covers the entire box */
+            height: 100%;
+            object-fit: cover; /* Ensures the image fits well within the box */
         }
         .box-back {
             position: absolute;
@@ -112,16 +118,18 @@
             border: 2px solid #333;
         }
         #box1 {
-            width: 464px;
-            height: 600px;
+            width: 556.8px; /* Increased by 20% */
+            height: 720px;  /* Increased by 20% */
         }
+
         #box2 {
-            width: 928px;
-            height: 600px;
+            width: 1113.6px; /* Increased by 20% */
+            height: 720px;  /* Increased by 20% */
         }
+
         #box3 {
-            width: 464px;
-            height: 600px;
+            width: 556.8px; /* Increased by 20% */
+            height: 720px;  /* Increased by 20% */
         }
         .nav-button {
             position: absolute;
@@ -187,8 +195,8 @@
 <body>
     <!-- Background Video -->
     <div class="video-background">
-        <video autoplay muted loop playsinline>
-            <source src="\bg\2.mp4" type="video/mp4">
+        <video id="backgroundVideo" autoplay muted loop playsinline>
+            <source src="C:\Rishabh\Projects\Hmm\bg\2.2.mp4" type="video/mp4">
             <!-- Since we can't use real videos in this playground, we're using a placeholder. 
                  In a real implementation, you would replace with an actual video URL -->
         </video>
@@ -200,7 +208,7 @@
             <div class="content">
                 <div class="dimensions-box" id="box1">
                     <div class="box-content">
-                        <span>464 × 600</span>
+                        <img src="bg\Page 1.png" alt="Page 1 Image">
                         <div class="box-shadow"></div>
                     </div>
                     <div class="box-back">
@@ -215,7 +223,7 @@
             <div class="content">
                 <div class="dimensions-box" id="box2">
                     <div class="box-content">
-                        <span>928 × 600</span>
+                        <img src="bg\Page 2.png" alt="Page 2 Image">
                         <div class="box-shadow"></div>
                     </div>
                     <div class="box-back">
@@ -230,7 +238,7 @@
             <div class="content">
                 <div class="dimensions-box" id="box3">
                     <div class="box-content">
-                        <span>464 × 600</span>
+                        <img src="bg\Page 3.png" alt="Page 3 Image">
                         <div class="box-shadow"></div>
                     </div>
                     <div class="box-back">
@@ -251,38 +259,14 @@
         const totalPages = 3;
         let isAnimating = false;
         
+        // Set video speed (decrease speed)
+        document.getElementById('backgroundVideo').playbackRate = 0.8; // 50% speed (decrease speed)
+
         // Initialize pages
         function initPages() {
             // Hide previous button initially
             document.getElementById('prevBtn').style.display = 'none';
             updatePageIndicator();
-            
-            // Try to play the video automatically (might be restricted by browsers)
-            const video = document.querySelector('video');
-            video.play().catch(error => {
-                console.log("Auto-play prevented:", error);
-                // Add a play button if autoplay fails
-                if (error.name === "NotAllowedError") {
-                    const playButton = document.createElement('button');
-                    playButton.innerText = "Play Background";
-                    playButton.style.position = "fixed";
-                    playButton.style.bottom = "20px";
-                    playButton.style.left = "20px";
-                    playButton.style.zIndex = "100";
-                    playButton.style.padding = "10px";
-                    playButton.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
-                    playButton.style.backdropFilter = "blur(5px)";
-                    playButton.style.border = "none";
-                    playButton.style.borderRadius = "5px";
-                    playButton.style.color = "white";
-                    playButton.style.cursor = "pointer";
-                    playButton.onclick = () => {
-                        video.play();
-                        playButton.style.display = "none";
-                    };
-                    document.body.appendChild(playButton);
-                }
-            });
         }
         
         function nextPage() {
